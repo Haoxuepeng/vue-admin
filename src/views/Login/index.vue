@@ -33,9 +33,9 @@
             v-model="ruleForm.password"
             autocomplete="off"
           ></el-input>
-          </el-form-item>
-          <!-- 重复密码 -->
-          <el-form-item label="重复密码" prop="passwords" v-show="flag">
+        </el-form-item>
+        <!-- 重复密码 -->
+        <el-form-item label="重复密码" prop="passwords" v-show="flag">
           <el-input
             type="password"
             v-model="ruleForm.passwords"
@@ -45,14 +45,19 @@
 
         <el-form-item label="验证码" prop="code">
           <el-row :gutter="10">
-            <el-col :span="16"
-              > <el-input v-model.number="ruleForm.code"></el-input></el-col>
-            <el-col :span="5"
+            <el-col :span="16">
+              <el-input v-model.number="ruleForm.code"></el-input
+            ></el-col>
+            <el-col :span="5">
+              <el-button
+                size="small"
+                type="danger"
+                class="block"
+                @click="getSmsClick"
+                >发送验证码</el-button
               >
-              <el-button size='small'  type="danger" class="block">发送验证码</el-button>
-              </el-col>
+            </el-col>
           </el-row>
-         
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('ruleForm')"
@@ -66,12 +71,15 @@
 </template>
 
 <script>
-import { validateEmail } from '@/utils/valitedata'
+import { validateEmail } from '@/utils/valitedata';
+import { GetSms } from '../../api/login';
+
 export default {
   name: 'Login',
   props: {},
+  components: {},
   data() {
-        // 验证账号
+    // 验证账号
     var checEmail = (rule, value, callback) => {
       var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
       if (!value) {
@@ -82,7 +90,7 @@ export default {
         callback();
       }
     };
-      // 验证密码
+    // 验证密码
     var validatePass = (rule, value, callback) => {
       var reg = /^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){4,19}$/;
       if (value === '') {
@@ -94,16 +102,16 @@ export default {
       }
     };
     // 验证重复密码
-     var validatePassWord = (rule, value, callback) => {
+    var validatePassWord = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'));
-      } else if (value!=this.ruleForm.password) {
+      } else if (value != this.ruleForm.password) {
         return callback(new Error('两次输入的密码不一致,请重新输入'));
       } else {
         callback();
       }
     };
-        // 验证验证码
+    // 验证验证码
     var checkCode = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入验证码'));
@@ -112,13 +120,13 @@ export default {
       }
     };
     return {
-      flag:false,
+      flag: false,
       menuTab: [{ name: '登录' }, { name: '注册' }],
       isActive: 0,
       ruleForm: {
         email: '',
         password: '',
-        passwords:'',
+        passwords: '',
         code: '',
       },
       rules: {
@@ -137,12 +145,33 @@ export default {
   mounted() {},
 
   methods: {
+    GetClick(date) {
+      console.log(date);
+    },
+    // 获取验证吗
+    getSmsClick() {
+      if (!this.ruleForm.email) {
+        this.$message.error('邮箱不能为空');
+        // return false;
+      }
+      const data = {
+        username: this.ruleForm.email,
+      };
+      GetSms(data)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
     menuTabClick() {
       if (this.isActive == 0) {
-        this.flag=true
+        this.flag = true;
         this.isActive = 1;
       } else {
-        this.flag=false
+        this.flag = false;
         this.isActive = 0;
       }
     },
@@ -194,7 +223,7 @@ li {
     background-color: rgba(0, 0, 0, 0.1);
   }
 }
-.block{
+.block {
   display: inline-block;
 }
 </style>
